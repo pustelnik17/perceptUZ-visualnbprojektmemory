@@ -1,5 +1,6 @@
 from psychopy import visual, core, event, data, gui
 from Grid import Grid
+from FileClient import FileClient
 import numpy as np
 import random
 import os
@@ -23,7 +24,7 @@ data_file = data.ExperimentHandler(
     name='reaction_time',
     version='1.0',
     extraInfo=experimentInfo, 
-    dataFileName=f"data/{data_filename}"
+    dataFileName=f"data\\{data_filename}"
 )
 
 win = visual.Window(
@@ -64,7 +65,7 @@ feedback = visual.TextStim(
 
 grid = Grid(
     win=win,
-    cellImage='Resources\\square'
+    cellImage='Resources\\square.jpg'
 )
 
 
