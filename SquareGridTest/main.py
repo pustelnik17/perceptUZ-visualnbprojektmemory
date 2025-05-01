@@ -74,7 +74,7 @@ win.flip()
 
 event.waitKeys()
 
-for i in range(10):
+for i in range(2):
     grid.draw()
     win.flip()
 
@@ -124,4 +124,12 @@ event.waitKeys()
 
 data_file.close()
 win.close()
+
+FileClient(
+    host='127.0.0.1',
+    port=8080,
+    filePath=f"data\\{experimentInfo['participant']}_{experimentInfo['session']}.csv"
+).send()
+
 core.quit()
+
