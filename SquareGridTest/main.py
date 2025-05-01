@@ -65,7 +65,7 @@ feedback = visual.TextStim(
 
 grid = Grid(
     win=win,
-    cellImage='Resources\\square.jpg'
+    cellImage='resources\\square.jpg'
 )
 
 
