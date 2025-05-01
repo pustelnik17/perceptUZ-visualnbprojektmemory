@@ -14,7 +14,7 @@ dlg = gui.DlgFromDict(dictionary=experimentInfo, title='Reaction Time Test')
 if not dlg.OK:
     core.quit()
 
-data_filename = f"participant_{experimentInfo['participant']}_session_{experimentInfo['session']}"
+data_filename = f"{experimentInfo['participant']}_{experimentInfo['session']}"
 
 if not os.path.isdir('data'):
     os.makedirs('data')
