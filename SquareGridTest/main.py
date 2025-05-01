@@ -27,7 +27,8 @@ data_file = data.ExperimentHandler(
 )
 
 win = visual.Window(
-    fullscr=True, 
+    size=(1000, 1000),
+    fullscr=False, 
     screen=1, 
     winType='pyglet', 
     allowGUI=False, 
@@ -80,6 +81,8 @@ for i in range(10):
     core.wait(random.uniform(1.0, 3.0))
     
     grid.draw()
+    
+    circle.pos=(-0.6 + random.choice([0, 1, 2]) * 0.3 * 2, 0.6 - random.choice([0, 1, 2]) * 0.3 * 2)
     circle.draw()
     win.flip()
     
