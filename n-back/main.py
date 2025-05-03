@@ -58,7 +58,6 @@ grid = Grid(
     cellImage='resources\\square.jpg'
 )
 
-trialNumber = []
 reactionTime = []
 reactionKey = []
 expectedKey = []
@@ -73,9 +72,6 @@ NUMBER_OF_TRIALS = 10
 positions = [(-0.6 + random.choice([0, 1, 2]) * 0.3 * 2, 0.6 - random.choice([0, 1, 2]) * 0.3 * 2) for _ in range(NUMBER_OF_TRIALS)]
 nbackTrue = [1 if positions[i] in positions[max(i-experimentInfo['n-back'], 0):i:] else 0 for i in range(NUMBER_OF_TRIALS)]
 
-print(positions)
-print(nbackTrue)
-
 for i in range(NUMBER_OF_TRIALS):
     grid.draw()
     win.flip()
@@ -89,8 +85,7 @@ for i in range(NUMBER_OF_TRIALS):
     win.flip()
     
     keys = event.waitKeys(maxWait=2.0, keyList=['space', 'escape'], timeStamped=core.Clock())
-    
-    trialNumber.append(i+1)
+
     if keys:
         key, rt = keys[0] 
         
@@ -120,7 +115,7 @@ response = requests.post(
     "http://127.0.0.1:5000/api/results",
     json={
         "name": f"{experimentInfo['participant']}_{experimentInfo['age']}_{experimentInfo['session']}",
-        "payload": pd.DataFrame([trialNumber, reactionTime, reactionKey, expectedKey]).to_json()
+        "payload": pd.DataFrame({"reactionTime": reactionTime, "reactionKey": reactionKey, "expectedKey": expectedKey}).to_json()
     }
 )
 print(response.text)
