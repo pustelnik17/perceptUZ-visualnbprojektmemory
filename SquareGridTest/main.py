@@ -1,9 +1,10 @@
 from psychopy import visual, core, event, data, gui
 from Grid import Grid
-from FileClient import FileClient
 import numpy as np
 import random
 import os
+import requests
+import pandas as pd
 
 experimentInfo = {
     'participant': '',
@@ -14,18 +15,6 @@ experimentInfo = {
 dlg = gui.DlgFromDict(dictionary=experimentInfo, title='Reaction Time Test')
 if not dlg.OK:
     core.quit()
-
-data_filename = f"{experimentInfo['participant']}_{experimentInfo['session']}"
-
-if not os.path.isdir('data'):
-    os.makedirs('data')
-
-data_file = data.ExperimentHandler(
-    name='reaction_time',
-    version='1.0',
-    extraInfo=experimentInfo, 
-    dataFileName=f"data\\{data_filename}"
-)
 
 win = visual.Window(
     size=(1000, 1000),
@@ -68,6 +57,8 @@ grid = Grid(
     cellImage='resources\\square.jpg'
 )
 
+reactionTime = []
+reactionKey = []
 
 instructions.text="Press the SPACE bar as quickly as possible when you see a circle.\n\nPress any key to begin."
 instructions.draw()
@@ -75,7 +66,8 @@ win.flip()
 
 event.waitKeys()
 
-for i in range(2):
+NUMBER_OF_TRIALS = 10
+for i in range(NUMBER_OF_TRIALS):
     grid.draw()
     win.flip()
 
@@ -92,28 +84,14 @@ for i in range(2):
     if keys:
         key, rt = keys[0] 
         
+        reactionTime.append(rt)
+        reactionKey.append(key)
+
         if key == 'escape':
             break
-        
-        feedback.text = f"Reaction time: {rt:.3f} seconds"
-        feedback.draw()
-        win.flip()
-        
-        data_file.addData('trial_number', i + 1)
-        data_file.addData('reaction_time', rt)
-        data_file.addData('response', key)
-        data_file.addData('timeout', False)
     else:
-        feedback.text = "Too slow! Please respond faster."
-        feedback.draw()
-        win.flip()
-        
-        data_file.addData('trial_number', i + 1)
-        data_file.addData('reaction_time', None)
-        data_file.addData('response', None)
-        data_file.addData('timeout', True)
-    
-    data_file.nextEntry()
+        reactionTime.append(None)
+        reactionKey.append(None)
     
     core.wait(1.0)
 
@@ -123,14 +101,14 @@ win.flip()
 
 event.waitKeys()
 
-data_file.close()
 win.close()
 
-FileClient(
-    host='127.0.0.1',
-    port=8080,
-    filePath=f"data\\{experimentInfo['participant']}_{experimentInfo['session']}.csv"
-).send()
+response = requests.post(
+    "http://127.0.0.1:5000/api/results",
+    json={
+        "name": f"{experimentInfo['participant']}_{experimentInfo['session']}",
+        "payload": pd.DataFrame([range(NUMBER_OF_TRIALS), reactionTime, reactionKey]).to_json()
+    }
+)
 
 core.quit()
-

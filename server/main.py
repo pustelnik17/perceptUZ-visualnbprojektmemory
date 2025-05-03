@@ -1,25 +1,19 @@
-import socket, pathlib
+from flask import Flask, jsonify, request
+import pathlib
 
-HOST = '127.0.0.1'
-PORT = 8080
+app = Flask(__name__)
 
-serverSocket = socket.socket()
-serverSocket.bind((HOST, PORT))
-serverSocket.listen(1)
-print(f"Listening on {HOST}:{PORT}")
+@app.route('/api/results', methods=['POST'])
+def createResultFile():
+    name = request.json.get("name")
+    payload = request.json.get("payload")
+    if name:
+        filePath = pathlib.Path.cwd() / "server" / "data" / f"{name}.json"
+        with open(filePath, "w+"):
+            filePath.write_text(payload)
 
-while True:
-    connection, address = serverSocket.accept()
+        return jsonify({"status": "file created"})
+    return jsonify({"error": "No message provided"}), 400
 
-    filenameLength = int.from_bytes(connection.recv(4), 'big')
-    filePath = pathlib.Path.cwd() / "server" / "data" / connection.recv(filenameLength).decode()
-
-    with open(filePath, 'wb') as f:
-        while True:
-            data = connection.recv(1024)
-            if not data:
-                break
-            f.write(data)
-
-    print("File received")
-    connection.close()
+if __name__ == '__main__':
+    app.run(debug=True)
